@@ -23,4 +23,9 @@ class FeeCalculatorTest extends TestCase
     {
         $this->assertEquals(400.0, $this->calc->calculate(new LoanApplication(12, 20000.0)));
     }
+
+    public function testCalculate_whenAmountMultipleOf1000_thenReturnCorrectFee()
+    {
+        $this->assertEquals(200.0, $this->calc->calculate(new LoanApplication(12, 10000.0)));
+    }
 }
