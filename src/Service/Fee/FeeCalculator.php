@@ -59,9 +59,7 @@ class FeeCalculator implements FeeCalculatorInterface
             return $this->term12[$upper];
         }
 
-        // TODO interpolate
-
-        return 1.5;
+        return $this->interpolate($lower, $upper, $application->getAmount());
     }
 
     private function getLowerBound(LoanApplication $application): int
@@ -72,6 +70,16 @@ class FeeCalculator implements FeeCalculatorInterface
     private function getUpperBound(LoanApplication $application): int
     {
         return intval(ceil($application->getAmount() / 1000) * 1000);
+    }
+
+    private function interpolate($lower, $upper, $amount): float
+    {
+        // m = (y2 - y1) / (x2 - x1)
+        $m = ($this->term12[$upper] - $this->term12[$lower]) / ($upper - $lower);
+        // c = y1 - (m * x1)
+        $c = $this->term12[$lower] - ($m * $lower);
+
+        return $m * $amount + $c;
     }
 
 }
