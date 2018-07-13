@@ -52,4 +52,9 @@ class FeeCalculatorTest extends TestCase
          */
         $this->assertEquals(70, $this->calc->calculate(new LoanApplication(12, 1500.0)));
     }
+
+    public function testCalculate_whenCalculatedFeeNotMultipleOf5_thenRoundUpToNearestMultipleOf5()
+    {
+        $this->assertEquals(60.0, $this->calc->calculate(new LoanApplication(12, 1234.0)));
+    }
 }
