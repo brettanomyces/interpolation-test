@@ -59,7 +59,9 @@ class FeeCalculator implements FeeCalculatorInterface
             return $this->term12[$upper];
         }
 
-        return $this->interpolate($lower, $upper, $application->getAmount());
+        $interpolated = $this->interpolate($lower, $upper, $application->getAmount());
+
+        return $this->roundUpToNearest5($interpolated);
     }
 
     private function getLowerBound(LoanApplication $application): int
@@ -82,4 +84,15 @@ class FeeCalculator implements FeeCalculatorInterface
         return $m * $amount + $c;
     }
 
+    private function roundUpToNearest5($amount): float
+    {
+        $intAmount = intval(ceil($amount));
+        $remainder = $intAmount % 5;
+
+        if ($remainder == 0) {
+            return $intAmount;
+        }
+
+        return $intAmount + (5 - $remainder);
+    }
 }
