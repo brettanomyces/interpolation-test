@@ -14,8 +14,13 @@ class FeeCalculatorTest extends TestCase
         $this->calc = new FeeCalculator();
     }
 
-    public function testCalculate(): void
+    public function testCalculate_whenTerm12AndMinimumAmount_thenReturn50()
     {
-        $this->assertEquals(1.5, $this->calc->calculate(new LoanApplication(1, 1.5)));
+        $this->assertEquals(50.0, $this->calc->calculate(new LoanApplication(12, 1000.0)));
+    }
+
+    public function testCalculate_whenTerm12AndMaximumAmount_thenReturn400()
+    {
+        $this->assertEquals(400.0, $this->calc->calculate(new LoanApplication(12, 20000.0)));
     }
 }
