@@ -38,6 +38,32 @@ class FeeCalculator implements FeeCalculatorInterface
     ];
 
     /**
+     * @var array
+     */
+    private $term24 = [
+        1000 => 70,
+        2000 => 100,
+        3000 => 120,
+        4000 => 160,
+        5000 => 200,
+        6000 => 240,
+        7000 => 280,
+        8000 => 320,
+        9000 => 360,
+        10000 => 400,
+        11000 => 440,
+        12000 => 480,
+        13000 => 520,
+        14000 => 560,
+        15000 => 600,
+        16000 => 640,
+        17000 => 680,
+        18000 => 720,
+        19000 => 760,
+        20000 => 800,
+    ];
+
+    /**
      * Calculates the fee for a loan application.
      *
      * @param LoanApplication $application The loan application to
@@ -49,42 +75,54 @@ class FeeCalculator implements FeeCalculatorInterface
     {
         $lower = $this->getLowerBound($application);
 
-        if ($application->getAmount() == $lower) {
-            return $this->term12[$lower];
+        if ($application->getAmount() == $lower->getAmount()) {
+            return $lower->getFee();
         }
 
         $upper = $this->getUpperBound($application);
 
-        if ($application->getAmount() == $upper) {
-            return $this->term12[$upper];
+        if ($application->getAmount() == $upper->getAmount()) {
+            return $upper->getFee();
         }
 
-        $interpolated = $this->interpolate($lower, $upper, $application->getAmount());
+        $interpolated = $this->interpolate($lower, $upper, $application);
 
         return $this->roundUpToNearest5($interpolated);
     }
 
-    private function getLowerBound(LoanApplication $application): int
+    private function getLowerBound(LoanApplication $application): FeeBoundary
     {
-        return intval(floor($application->getAmount() / 1000) * 1000);
+        $boundary = intval(floor($application->getAmount() / 1000) * 1000);
+        $fee = $application->getTerm() == 12 ? $this->term12[$boundary] : $this->term24[$boundary];
+        return new FeeBoundary($boundary, $fee);
     }
 
-    private function getUpperBound(LoanApplication $application): int
+    private function getUpperBound(LoanApplication $application): FeeBoundary
     {
-        return intval(ceil($application->getAmount() / 1000) * 1000);
+        $boundary = intval(ceil($application->getAmount() / 1000) * 1000);
+        $fee = $application->getTerm() == 12 ? $this->term12[$boundary] : $this->term24[$boundary];
+        return new FeeBoundary($boundary, $fee);
     }
 
-    private function interpolate($lower, $upper, $amount): float
+    private function interpolate(FeeBoundary $lower, FeeBoundary $upper, LoanApplication $application): float
     {
-        // m = (y2 - y1) / (x2 - x1)
-        $m = ($this->term12[$upper] - $this->term12[$lower]) / ($upper - $lower);
-        // c = y1 - (m * x1)
-        $c = $this->term12[$lower] - ($m * $lower);
+        return $this->performInterpolation(
+            $lower->getAmount(),
+            $lower->getFee(),
+            $upper->getAmount(),
+            $upper->getFee(),
+            $application->getAmount()
+        );
+    }
 
+    private function performInterpolation(float $x1, float $y1, float $x2, float $y2, float $amount): float
+    {
+        $m = ($y2 - $y1) / ($x2 - $x1);
+        $c = $y1 - ($m * $x1);
         return $m * $amount + $c;
     }
 
-    private function roundUpToNearest5($amount): float
+    private function roundUpToNearest5(float $amount): float
     {
         $intAmount = intval(ceil($amount));
         $remainder = $intAmount % 5;

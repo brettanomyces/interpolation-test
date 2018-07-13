@@ -41,7 +41,7 @@ class FeeCalculatorTest extends TestCase
 
     public function testCalculate_whenTerm24AmountMultipleOf1000_thenReturnCorrectFee()
     {
-        $this->assertEquals(400.0, $this->calc->calculate(new LoanApplication(12, 10000.0)));
+        $this->assertEquals(400.0, $this->calc->calculate(new LoanApplication(24, 10000.0)));
     }
 
     public function testCalculate_whenAmountNotMultipleOf1000_thenReturnCalculatedFee()
