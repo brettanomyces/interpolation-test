@@ -81,10 +81,6 @@ class FeeCalculator implements FeeCalculatorInterface
 
         $upper = $this->getUpperBound($application);
 
-        if ($application->getAmount() == $upper->getAmount()) {
-            return $upper->getFee();
-        }
-
         $interpolated = $this->interpolate($lower, $upper, $application);
 
         return $this->roundUpToNearest5($interpolated);
