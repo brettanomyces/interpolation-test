@@ -111,11 +111,11 @@ class FeeCalculator implements FeeCalculatorInterface
         );
     }
 
-    private function performInterpolation(float $x1, float $y1, float $x2, float $y2, float $amount): float
+    private function performInterpolation(float $x1, float $y1, float $x2, float $y2, float $x): float
     {
         $m = ($y2 - $y1) / ($x2 - $x1);
         $c = $y1 - ($m * $x1);
-        return $m * $amount + $c;
+        return $m * $x + $c;
     }
 
     private function roundUpToNearest5(float $amount): float
