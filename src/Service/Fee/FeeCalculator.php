@@ -120,13 +120,13 @@ class FeeCalculator implements FeeCalculatorInterface
 
     private function roundUpToNearest5(float $amount): float
     {
-        $intAmount = intval(ceil($amount));
+        $intAmount = ceil($amount);
         $remainder = $intAmount % 5;
 
-        if ($remainder == 0) {
-            return $intAmount;
+        if ($remainder != 0) {
+            $intAmount + (5 - $remainder);
         }
 
-        return $intAmount + (5 - $remainder);
+        return $intAmount;
     }
 }
